@@ -1,6 +1,14 @@
 import { ArrowUpDown, ChevronLeft, ChevronRight, Download, Filter, Search } from "lucide-react";
-import { employees } from "../../features/employees/employee.data";
+//import { employees } from "../../features/employees/employee.data";
 import type { EmployeeStatus } from "../../features/employees/employee.types";
+import { generateEmployees } from "../../features/employees/employee.generator";
+
+
+
+
+const employees = generateEmployees(1000);
+
+
 
 const salaryFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
