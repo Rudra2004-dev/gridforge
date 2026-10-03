@@ -1,19 +1,27 @@
-import { employees } from "./employee.data";
+import { useMemo } from "react";
+import { useEmployeeStore } from "./employee.store";
 
 function EmployeeStats() {
-  const totalEmployees = employees.length;
-  const activeEmployees = employees.filter((employee) => employee.status === "Active").length;
-  const departments = new Set(employees.map((employee) => employee.department)).size;
+  const employees = useEmployeeStore((state) => state.employees);
+
+  const { total, active, departments } = useMemo(
+    () => ({
+      total: employees.length,
+      active: employees.filter((employee) => employee.status === "Active").length,
+      departments: new Set(employees.map((employee) => employee.department)).size,
+    }),
+    [employees],
+  );
 
   return (
     <section className="stats-grid" aria-label="Employee statistics">
       <article className="stat-card">
         <span>Total Employees</span>
-        <strong>{totalEmployees}</strong>
+        <strong>{total.toLocaleString()}</strong>
       </article>
       <article className="stat-card">
         <span>Active Employees</span>
-        <strong>{activeEmployees}</strong>
+        <strong>{active.toLocaleString()}</strong>
       </article>
       <article className="stat-card">
         <span>Departments</span>

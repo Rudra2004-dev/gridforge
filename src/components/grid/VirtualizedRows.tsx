@@ -1,9 +1,17 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import type { Employee, EmployeeStatus } from "../../features/employees/employee.types";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import type {
+  Employee,
+  EmployeeStatus,
+  SortKey,
+  SortState,
+} from "../../features/employees/employee.types";
 
 type VirtualizedRowsProps = {
   employees: Employee[];
+  sort: SortState | null;
+  onSort: (key: SortKey) => void;
 };
 
 const ROW_HEIGHT = 56;
@@ -11,6 +19,17 @@ const ROW_HEIGHT = 56;
 // ONE template, used by the header AND every row
 const GRID_COLUMNS =
   "96px 220px minmax(240px, 1.5fr) minmax(160px, 1fr) minmax(140px, 1fr) 120px 110px 130px";
+
+const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
+  { key: "id", label: "ID" },
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "role", label: "Role" },
+  { key: "department", label: "Department" },
+  { key: "salary", label: "Salary", align: "right" },
+  { key: "status", label: "Status" },
+  { key: "joiningDate", label: "Joining Date", align: "right" },
+];
 
 const salaryFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -31,7 +50,7 @@ function statusClassName(status: EmployeeStatus): string {
   return "status-badge status-badge--inactive";
 }
 
-function VirtualizedRows({ employees }: VirtualizedRowsProps) {
+function VirtualizedRows({ employees, sort, onSort }: VirtualizedRowsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -41,18 +60,44 @@ function VirtualizedRows({ employees }: VirtualizedRowsProps) {
     overscan: 10,
   });
 
+  // New search or sort result => go back to the top
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [employees]);
+
   return (
     <div className="vgrid-scroll" ref={scrollRef}>
       <div className="vgrid" style={{ ["--cols" as string]: GRID_COLUMNS }}>
         <div className="vgrid-row vgrid-header" role="row">
-          <div className="vgrid-cell">ID</div>
-          <div className="vgrid-cell">Name</div>
-          <div className="vgrid-cell">Email</div>
-          <div className="vgrid-cell">Role</div>
-          <div className="vgrid-cell">Department</div>
-          <div className="vgrid-cell vgrid-cell--right">Salary</div>
-          <div className="vgrid-cell">Status</div>
-          <div className="vgrid-cell vgrid-cell--right">Joining Date</div>
+          {COLUMNS.map(({ key, label, align }) => {
+            const direction = sort?.key === key ? sort.direction : null;
+            const ariaSort =
+              direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none";
+
+            return (
+              <div
+                key={key}
+                role="columnheader"
+                aria-sort={ariaSort}
+                className={`vgrid-cell vgrid-cell--head${align === "right" ? " vgrid-cell--right" : ""}`}
+              >
+                <button
+                  type="button"
+                  className={`sort-button${direction ? " is-active" : ""}`}
+                  onClick={() => onSort(key)}
+                >
+                  <span>{label}</span>
+                  {direction === "asc" ? (
+                    <ArrowUp size={12} />
+                  ) : direction === "desc" ? (
+                    <ArrowDown size={12} />
+                  ) : (
+                    <ArrowUpDown size={12} className="sort-icon-idle" />
+                  )}
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         <div style={{ height: rowVirtualizer.getTotalSize(), position: "relative" }}>

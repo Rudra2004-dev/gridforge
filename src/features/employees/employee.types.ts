@@ -14,3 +14,18 @@ export interface Employee  {
     status: EmployeeStatus;
     joiningDate: string;
 }
+
+
+export type SortKey = keyof Employee;
+export type SortDirection = "asc" | "desc";
+
+export interface SortState {
+  key: SortKey;
+  direction: SortDirection;
+}
+
+
+export interface EmployeeFilters {
+  status: EmployeeStatus | null;   // null = "All"
+  department: string | null;       // null = "All"
+}

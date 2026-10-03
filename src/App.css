@@ -528,6 +528,120 @@
   font-variant-numeric: tabular-nums;
 }
 
+
+.toolbar-button.is-active {
+  border-color: var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+.filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #18181b;
+  color: #fafafa;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(250, 250, 250, 0.7);
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.filter-field select {
+  height: 34px;
+  min-width: 180px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.filter-field select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.grid-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+
+.vgrid-cell--head {
+  padding: 0 6px; /* button padding below brings text back to the 14px body inset */
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.sort-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+}
+
+.sort-button.is-active {
+  color: var(--text);
+}
+
+.sort-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.sort-icon-idle {
+  opacity: 0.35;
+}
+
+.sort-button:hover .sort-icon-idle {
+  opacity: 0.8;
+}
+
 .header,
 .stat-card,
 .grid-card {
