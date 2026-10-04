@@ -11,6 +11,11 @@ import { sortEmployees } from "../../features/employees/employee.sort";
 import type { EmployeeStatus } from "../../features/employees/employee.types";
 import { useDebounce } from "../../hooks/useDebounce";
 import VirtualizedRows from "./VirtualizedRows";
+import {
+  buildCsvFilename,
+  downloadCsv,
+  toCsv,
+} from "../../features/employees/employee.export";
 
 function DataGrid() {
   const employees = useEmployeeStore((state) => state.employees);
@@ -41,6 +46,13 @@ function DataGrid() {
     [filtered, debouncedQuery],
   );
   const visibleEmployees = useMemo(() => sortEmployees(searched, sort), [searched, sort]);
+
+
+  const handleExport = () => {
+  const isFiltered = visibleEmployees.length !== employees.length;
+  downloadCsv(toCsv(visibleEmployees), buildCsvFilename(isFiltered));
+};
+
 
   const activeFilterCount = countActiveFilters(filters);
 
@@ -77,11 +89,13 @@ function DataGrid() {
           </button>
         )}
 
-        <button type="button" className="toolbar-button">
-          <Download size={15} />
-          <span>Export</span>
-        </button>
-      </div>
+          <button type="button" className="toolbar-button" onClick={handleExport}
+              disabled={visibleEmployees.length === 0}
+              title={`Export ${visibleEmployees.length.toLocaleString()} rows as CSV`}>
+            <Download size={15} />
+            <span>Export</span>
+          </button>
+    </div>
 
       {filtersOpen && (
         <div className="filter-bar" id="filter-bar">

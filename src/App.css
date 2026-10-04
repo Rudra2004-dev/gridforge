@@ -605,6 +605,12 @@
   padding: 0 6px; /* button padding below brings text back to the 14px body inset */
 }
 
+
+.toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .sort-button {
   display: inline-flex;
   align-items: center;
