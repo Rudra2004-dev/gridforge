@@ -1,7 +1,23 @@
 import { create } from "zustand";
 import { generateEmployees } from "./employee.generator";
 import { DEFAULT_FILTERS } from "./employee.filter";
-import type { Employee, EmployeeFilters, SortKey, SortState } from "./employee.types";
+import type {
+  Employee,
+  EmployeeFilters,
+  EmployeeInput,
+  SortKey,
+  SortState,
+} from "./employee.types";
+
+// Next ID = highest existing number + 1 (not length + 1, which can collide once rows can be removed)
+function nextEmployeeId(employees: Employee[]): string {
+  let max = 0;
+  for (const employee of employees) {
+    const value = Number(employee.id.replace(/^EMP/, ""));
+    if (value > max) max = value;
+  }
+  return `EMP${String(max + 1).padStart(4, "0")}`;
+}
 
 type EmployeeState = {
   employees: Employee[];
@@ -13,6 +29,7 @@ type EmployeeState = {
   clearSort: () => void;
   setFilter: <K extends keyof EmployeeFilters>(key: K, value: EmployeeFilters[K]) => void;
   resetFilters: () => void;
+  addEmployee: (input: EmployeeInput) => void;
 };
 
 export const useEmployeeStore = create<EmployeeState>()((set) => ({
@@ -33,8 +50,17 @@ export const useEmployeeStore = create<EmployeeState>()((set) => ({
 
   clearSort: () => set({ sort: null }),
 
-  // New object each time so useMemo([filters]) sees the change
   setFilter: (key, value) => set((state) => ({ filters: { ...state.filters, [key]: value } })),
 
   resetFilters: () => set({ filters: DEFAULT_FILTERS }),
+
+  // One atomic update: add the row AND clear the view, so a leftover search,
+  // filter or sort can't hide the employee the user just created.
+  addEmployee: (input) =>
+    set((state) => ({
+      employees: [{ ...input, id: nextEmployeeId(state.employees) }, ...state.employees],
+      query: "",
+      filters: DEFAULT_FILTERS,
+      sort: null,
+    })),
 }));

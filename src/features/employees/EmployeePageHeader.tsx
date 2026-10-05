@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Plus } from "lucide-react";
+import AddEmployeeDialog from "./AddEmployeeDialog";
 
 function EmployeePageHeader() {
+  const [addOpen, setAddOpen] = useState(false);
+
   return (
     <section className="page-header">
       <div>
@@ -11,10 +15,12 @@ function EmployeePageHeader() {
         </p>
       </div>
 
-      <button type="button" className="primary-button">
+      <button type="button" className="primary-button" onClick={() => setAddOpen(true)}>
         <Plus size={16} />
         Add Employee
       </button>
+
+      <AddEmployeeDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </section>
   );
 }

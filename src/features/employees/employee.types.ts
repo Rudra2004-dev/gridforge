@@ -29,3 +29,6 @@ export interface EmployeeFilters {
   status: EmployeeStatus | null;   // null = "All"
   department: string | null;       // null = "All"
 }
+
+
+export type EmployeeInput = Omit<Employee, "id">;
