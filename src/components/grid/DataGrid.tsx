@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Download, Filter, Search, X } from "lucide-react";
+import { Download, Filter, Search, X } from "lucide-react";
 import { useEmployeeStore } from "../../features/employees/employee.store";
+import {
+  buildCsvFilename,
+  downloadCsv,
+  toCsv,
+} from "../../features/employees/employee.export";
 import {
   STATUS_OPTIONS,
   countActiveFilters,
@@ -10,12 +15,9 @@ import { searchEmployees } from "../../features/employees/employee.search";
 import { sortEmployees } from "../../features/employees/employee.sort";
 import type { EmployeeStatus } from "../../features/employees/employee.types";
 import { useDebounce } from "../../hooks/useDebounce";
+import { usePagination } from "../../hooks/usePagination";
+import Pagination from "./Pagination";
 import VirtualizedRows from "./VirtualizedRows";
-import {
-  buildCsvFilename,
-  downloadCsv,
-  toCsv,
-} from "../../features/employees/employee.export";
 
 function DataGrid() {
   const employees = useEmployeeStore((state) => state.employees);
@@ -28,7 +30,6 @@ function DataGrid() {
   const setFilter = useEmployeeStore((state) => state.setFilter);
   const resetFilters = useEmployeeStore((state) => state.resetFilters);
 
-  // UI-only state (is the panel open?) stays local; data state lives in the store
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const debouncedQuery = useDebounce(query, 250);
@@ -38,8 +39,7 @@ function DataGrid() {
     [employees],
   );
 
-  // Pipeline: filter -> search -> sort -> virtualize
-  // Separate memos so each stage only re-runs when its own inputs change.
+  // Pipeline: filter -> search -> sort -> paginate -> virtualize
   const filtered = useMemo(() => filterEmployees(employees, filters), [employees, filters]);
   const searched = useMemo(
     () => searchEmployees(filtered, debouncedQuery),
@@ -47,14 +47,27 @@ function DataGrid() {
   );
   const visibleEmployees = useMemo(() => sortEmployees(searched, sort), [searched, sort]);
 
+  // Anything that changes WHICH rows we're paging over resets to page 1.
+  // employees.length is included so a newly added employee (shown at the top) is visible.
+  const resetKey = [
+    debouncedQuery,
+    filters.status,
+    filters.department,
+    sort?.key,
+    sort?.direction,
+    employees.length,
+  ].join("|");
 
-  const handleExport = () => {
-  const isFiltered = visibleEmployees.length !== employees.length;
-  downloadCsv(toCsv(visibleEmployees), buildCsvFilename(isFiltered));
-};
-
+  const { page, pageSize, totalPages, pageItems, rangeStart, rangeEnd, setPage, setPageSize } =
+    usePagination(visibleEmployees, resetKey);
 
   const activeFilterCount = countActiveFilters(filters);
+
+  // Exports every matching row across all pages, not just the current page
+  const handleExport = () => {
+    const isFiltered = visibleEmployees.length !== employees.length;
+    downloadCsv(toCsv(visibleEmployees), buildCsvFilename(isFiltered));
+  };
 
   return (
     <section className="grid-card">
@@ -89,13 +102,17 @@ function DataGrid() {
           </button>
         )}
 
-          <button type="button" className="toolbar-button" onClick={handleExport}
-              disabled={visibleEmployees.length === 0}
-              title={`Export ${visibleEmployees.length.toLocaleString()} rows as CSV`}>
-            <Download size={15} />
-            <span>Export</span>
-          </button>
-    </div>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={handleExport}
+          disabled={visibleEmployees.length === 0}
+          title={`Export ${visibleEmployees.length.toLocaleString()} rows as CSV`}
+        >
+          <Download size={15} />
+          <span>Export</span>
+        </button>
+      </div>
 
       {filtersOpen && (
         <div className="filter-bar" id="filter-bar">
@@ -146,7 +163,7 @@ function DataGrid() {
       )}
 
       {visibleEmployees.length > 0 ? (
-        <VirtualizedRows employees={visibleEmployees} sort={sort} onSort={toggleSort} />
+        <VirtualizedRows employees={pageItems} sort={sort} onSort={toggleSort} />
       ) : (
         <div className="grid-empty">
           <span>No employees match your search and filters.</span>
@@ -158,20 +175,17 @@ function DataGrid() {
         </div>
       )}
 
-      <div className="grid-footer">
-        <span>
-          Showing {visibleEmployees.length.toLocaleString()} of {employees.length.toLocaleString()} employees
-        </span>
-        <div className="pagination" aria-label="Pagination">
-          <button type="button" className="pagination-button is-disabled" aria-disabled="true">
-            <ChevronLeft size={14} />
-          </button>
-          <span className="pagination-page">1</span>
-          <button type="button" className="pagination-button is-disabled" aria-disabled="true">
-            <ChevronRight size={14} />
-          </button>
-        </div>
-      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        rangeStart={rangeStart}
+        rangeEnd={rangeEnd}
+        totalItems={visibleEmployees.length}
+        unfilteredTotal={employees.length}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
     </section>
   );
 }
