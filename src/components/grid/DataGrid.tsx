@@ -30,7 +30,9 @@ function DataGrid() {
   const setFilter = useEmployeeStore((state) => state.setFilter);
   const resetFilters = useEmployeeStore((state) => state.resetFilters);
 
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(
+  () => countActiveFilters(useEmployeeStore.getState().filters) > 0,
+);
 
   const debouncedQuery = useDebounce(query, 250);
 

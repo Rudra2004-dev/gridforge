@@ -30,6 +30,7 @@ type EmployeeState = {
   setFilter: <K extends keyof EmployeeFilters>(key: K, value: EmployeeFilters[K]) => void;
   resetFilters: () => void;
   addEmployee: (input: EmployeeInput) => void;
+  showOnly: (filters: Partial<EmployeeFilters>) => void;
 };
 
 export const useEmployeeStore = create<EmployeeState>()((set) => ({
@@ -53,6 +54,11 @@ export const useEmployeeStore = create<EmployeeState>()((set) => ({
   setFilter: (key, value) => set((state) => ({ filters: { ...state.filters, [key]: value } })),
 
   resetFilters: () => set({ filters: DEFAULT_FILTERS }),
+
+    // Used by Overview links: jump to the grid with exactly this filter applied.
+  // One atomic set(), so there's no intermediate render with a half-applied view.
+  showOnly: (filters) =>
+    set({ filters: { ...DEFAULT_FILTERS, ...filters }, query: "", sort: null }),
 
   // One atomic update: add the row AND clear the view, so a leftover search,
   // filter or sort can't hide the employee the user just created.

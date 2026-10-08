@@ -1,12 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
-interface PageContainerProps {
-  children: ReactNode;
-}
-
-function PageContainer({ children }: PageContainerProps) {
+function PageContainer() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -23,6 +20,7 @@ function PageContainer({ children }: PageContainerProps) {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)}
+        onNavigate={() => setMobileNavOpen(false)} // close the mobile drawer after choosing a page
       />
 
       {mobileNavOpen ? (
@@ -37,8 +35,12 @@ function PageContainer({ children }: PageContainerProps) {
       <div className="content-area">
         <Header onMenuClick={() => setMobileNavOpen((open) => !open)} />
 
-        <main className="main-content">{children}</main>
+        <main className="main-content">
+          <Outlet />
+        </main>
       </div>
+
+      <ScrollRestoration />
     </div>
   );
 }

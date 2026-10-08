@@ -6,20 +6,22 @@ import {
   Settings,
   Table2,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  onNavigate: () => void;
 }
 
 const navItems = [
-  { label: "Overview", icon: LayoutDashboard, active: false },
-  { label: "Data Grid", icon: Table2, active: true },
-  { label: "Analytics", icon: BarChart3, active: false },
-  { label: "Settings", icon: Settings, active: false },
+  { label: "Overview", to: "/overview", icon: LayoutDashboard },
+  { label: "Data Grid", to: "/employees", icon: Table2 },
+  { label: "Analytics", to: "/analytics", icon: BarChart3 },
+  { label: "Settings", to: "/settings", icon: Settings },
 ] as const;
 
-function Sidebar({ collapsed, onToggle }: SidebarProps) {
+function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar" aria-label="Workspace navigation">
       <div className="sidebar-top">
@@ -50,16 +52,19 @@ function Sidebar({ collapsed, onToggle }: SidebarProps) {
           const Icon = item.icon;
 
           return (
-            <button
-              key={item.label}
-              type="button"
-              className={item.active ? "sidebar-nav-item is-active" : "sidebar-nav-item"}
-              aria-current={item.active ? "page" : undefined}
+            // NavLink adds aria-current="page" and the isActive flag automatically
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                isActive ? "sidebar-nav-item is-active" : "sidebar-nav-item"
+              }
               title={collapsed ? item.label : undefined}
+              onClick={onNavigate}
             >
               <Icon size={16} />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </nav>
