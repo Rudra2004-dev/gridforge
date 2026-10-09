@@ -4,6 +4,7 @@ import ComingSoonPage from "./pages/ComingSoonPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import OverviewPage from "./pages/OverviewPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 export const router = createBrowserRouter([
   {
@@ -15,13 +16,7 @@ export const router = createBrowserRouter([
       { path: "employees", element: <EmployeesPage /> },
       {
         path: "analytics",
-        element: (
-          <ComingSoonPage
-            title="Analytics"
-            description="Trends and breakdowns across your workforce."
-          />
-        ),
-      },
+        element: <AnalyticsPage /> },
       {
         path: "settings",
         element: (
