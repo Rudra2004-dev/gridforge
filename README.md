@@ -15,7 +15,7 @@
 
 An employee data grid built with React and TypeScript that stays smooth at **100,000 rows**. It combines row virtualization, pagination, and memoized client-side search, sort and filter, with a workspace around it: an overview dashboard, analytics, and persistent settings.
 
-**[Live demo](gridforge-rudra.vercel.app)** · [Report an issue](https://github.com/rudra2004-dev/gridforge/issues)
+**[Live demo](https://gridforge-rudra.vercel.app)** · [Report an issue](https://github.com/rudra2004-dev/gridforge/issues)
 
 <!-- TODO: add docs/demo.gif (scrolling, searching, sorting, switching to 100,000 rows) -->
 ![GridForge demo](docs/demo.gif)
