@@ -481,7 +481,7 @@
 }
 
 .vgrid {
-  min-width: 1216px; /* sum of the fixed widths in GRID_COLUMNS */
+  min-width: 964px; /* sum of the fixed widths in GRID_COLUMNS */
 }
 
 .vgrid-row {
@@ -515,7 +515,7 @@
 }
 
 .vgrid-cell {
-  padding: 0 14px;
+  padding: 0 10px;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -690,6 +690,86 @@ a.primary-button {
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+}
+
+
+/* ---------- Settings ---------- */
+
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.setting-row:first-child {
+  padding-top: 0;
+}
+
+.setting-row:last-of-type {
+  border-bottom: 0;
+}
+
+.setting-text .panel-title {
+  margin: 0;
+}
+
+.setting-description {
+  max-width: 46ch;
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.setting-stat {
+  margin: 4px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Grid polish ---------- */
+
+/* Tighter sort buttons so headers fit the narrower columns */
+.sort-button {
+  gap: 4px;
+  padding: 0 4px;
+}
+
+/* Long names get an ellipsis instead of being clipped */
+.name-cell {
+  min-width: 0;
+}
+
+.name-cell strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Compact density */
+.vgrid--compact .vgrid-body-row {
+  font-size: 12px;
+}
+
+.vgrid--compact .cell-avatar {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
 }
 
 .panel {

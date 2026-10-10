@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { generateEmployees } from "./employee.generator";
 import { DEFAULT_FILTERS } from "./employee.filter";
+import { generateEmployees } from "./employee.generator";
+import { useSettingsStore, type DatasetSize } from "../settings/settings.store";
 import type {
   Employee,
   EmployeeFilters,
@@ -19,8 +20,19 @@ function nextEmployeeId(employees: Employee[]): string {
   return `EMP${String(max + 1).padStart(4, "0")}`;
 }
 
+function generateTimed(size: number) {
+  const start = performance.now();
+  const employees = generateEmployees(size);
+  return { employees, generationMs: performance.now() - start };
+}
+
+// The settings store hydrates from localStorage synchronously when it is created,
+// so this already reflects the dataset size the user chose last time.
+const initial = generateTimed(useSettingsStore.getState().datasetSize);
+
 type EmployeeState = {
   employees: Employee[];
+  generationMs: number;
   query: string;
   sort: SortState | null;
   filters: EmployeeFilters;
@@ -29,12 +41,14 @@ type EmployeeState = {
   clearSort: () => void;
   setFilter: <K extends keyof EmployeeFilters>(key: K, value: EmployeeFilters[K]) => void;
   resetFilters: () => void;
-  addEmployee: (input: EmployeeInput) => void;
   showOnly: (filters: Partial<EmployeeFilters>) => void;
+  addEmployee: (input: EmployeeInput) => void;
+  loadDataset: (size: DatasetSize) => void;
 };
 
 export const useEmployeeStore = create<EmployeeState>()((set) => ({
-  employees: generateEmployees(1000),
+  employees: initial.employees,
+  generationMs: initial.generationMs,
   query: "",
   sort: null,
   filters: DEFAULT_FILTERS,
@@ -55,8 +69,7 @@ export const useEmployeeStore = create<EmployeeState>()((set) => ({
 
   resetFilters: () => set({ filters: DEFAULT_FILTERS }),
 
-    // Used by Overview links: jump to the grid with exactly this filter applied.
-  // One atomic set(), so there's no intermediate render with a half-applied view.
+  // Used by Overview links: jump to the grid with exactly this filter applied.
   showOnly: (filters) =>
     set({ filters: { ...DEFAULT_FILTERS, ...filters }, query: "", sort: null }),
 
@@ -69,4 +82,12 @@ export const useEmployeeStore = create<EmployeeState>()((set) => ({
       filters: DEFAULT_FILTERS,
       sort: null,
     })),
+
+  // The single entry point for "replace the data": Settings calls only this.
+  // It also records the chosen size so the next page load generates the same amount.
+  loadDataset: (size) => {
+    const { employees, generationMs } = generateTimed(size);
+    useSettingsStore.getState().setDatasetSize(size);
+    set({ employees, generationMs, query: "", sort: null, filters: DEFAULT_FILTERS });
+  },
 }));

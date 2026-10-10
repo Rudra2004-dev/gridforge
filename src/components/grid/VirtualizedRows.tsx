@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import {
+  DENSITY_ROW_HEIGHT,
+  useSettingsStore,
+} from "../../features/settings/settings.store";
 import type {
   Employee,
   EmployeeStatus,
@@ -14,11 +18,10 @@ type VirtualizedRowsProps = {
   onSort: (key: SortKey) => void;
 };
 
-const ROW_HEIGHT = 56;
-
-// ONE template, used by the header AND every row
+// ONE template, used by the header AND every row.
+// The fixed + minimum widths add up to 964px, which is the .vgrid min-width in App.css.
 const GRID_COLUMNS =
-  "96px 220px minmax(240px, 1.5fr) minmax(160px, 1fr) minmax(140px, 1fr) 120px 110px 130px";
+  "72px 170px minmax(180px, 1.4fr) minmax(130px, 1fr) minmax(120px, 1fr) 84px 84px 124px";
 
 const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
   { key: "id", label: "ID" },
@@ -53,21 +56,29 @@ function statusClassName(status: EmployeeStatus): string {
 function VirtualizedRows({ employees, sort, onSort }: VirtualizedRowsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Density is changed on the Settings page, so this component is mounted fresh with the
+  // new row height when you come back. No virtualizer re-measure needed.
+  const density = useSettingsStore((state) => state.density);
+  const rowHeight = DENSITY_ROW_HEIGHT[density];
+
   const rowVirtualizer = useVirtualizer({
     count: employees.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => ROW_HEIGHT,
+    estimateSize: () => rowHeight,
     overscan: 10,
   });
 
-  // New search or sort result => go back to the top
+  // New search, filter, sort or page => go back to the top
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [employees]);
 
   return (
     <div className="vgrid-scroll" ref={scrollRef}>
-      <div className="vgrid" style={{ ["--cols" as string]: GRID_COLUMNS }}>
+      <div
+        className={`vgrid vgrid--${density}`}
+        style={{ ["--cols" as string]: GRID_COLUMNS }}
+      >
         <div className="vgrid-row vgrid-header" role="row">
           {COLUMNS.map(({ key, label, align }) => {
             const direction = sort?.key === key ? sort.direction : null;
@@ -113,22 +124,28 @@ function VirtualizedRows({ employees, sort, onSort }: VirtualizedRowsProps) {
                   top: 0,
                   left: 0,
                   width: "100%",
-                  height: ROW_HEIGHT,
+                  height: rowHeight,
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
                 <div className="vgrid-cell cell-muted">{employee.id}</div>
                 <div className="vgrid-cell">
-                  <div className="name-cell">
+                  <div className="name-cell" title={employee.name}>
                     <span className="cell-avatar" aria-hidden="true">
                       {getInitials(employee.name)}
                     </span>
                     <strong>{employee.name}</strong>
                   </div>
                 </div>
-                <div className="vgrid-cell cell-muted">{employee.email}</div>
-                <div className="vgrid-cell">{employee.role}</div>
-                <div className="vgrid-cell">{employee.department}</div>
+                <div className="vgrid-cell cell-muted" title={employee.email}>
+                  {employee.email}
+                </div>
+                <div className="vgrid-cell" title={employee.role}>
+                  {employee.role}
+                </div>
+                <div className="vgrid-cell" title={employee.department}>
+                  {employee.department}
+                </div>
                 <div className="vgrid-cell vgrid-cell--right">
                   {salaryFormatter.format(employee.salary)}
                 </div>

@@ -78,7 +78,7 @@ function pickJoiningDate(rng: Rng): string {
 
 export function generateEmployees(count: number, seed = 42): Employee[] {
   const rng = createRng(seed);
-  const usedEmails = new Set<string>();
+  const emailCounts = new Map<string, number>();
   const employees: Employee[] = [];
 
   for (let i = 1; i <= count; i++) {
@@ -89,14 +89,12 @@ export function generateEmployees(count: number, seed = 42): Employee[] {
     const [minSalary, maxSalary] = salary;
 
     // 30 x 30 names collide quickly, so make emails unique
+        // 30 x 30 names collide quickly: 1st "a.b", 2nd "a.b2", 3rd "a.b3", ...
     const baseEmail = `${first}.${last}`.toLowerCase();
-    let email = `${baseEmail}@gridforge.dev`;
-    let suffix = 2;
-    while (usedEmails.has(email)) {
-      email = `${baseEmail}${suffix}@gridforge.dev`;
-      suffix++;
-    }
-    usedEmails.add(email);
+    const occurrence = (emailCounts.get(baseEmail) ?? 0) + 1;
+    emailCounts.set(baseEmail, occurrence);
+    const email =
+      occurrence === 1 ? `${baseEmail}@gridforge.dev` : `${baseEmail}${occurrence}@gridforge.dev`;
 
     employees.push({
       id: `EMP${String(i).padStart(4, "0")}`,
