@@ -258,31 +258,10 @@
   color: var(--text-secondary);
 }
 
-.header-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  max-width: 420px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid rgba(228, 228, 231, 0.9);
-  border-radius: var(--radius-sm);
-  background: rgba(250, 250, 250, 0.72);
-  color: var(--text-muted);
-}
 
-.header-search input {
-  width: 100%;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.header-search input::placeholder {
-  color: var(--text-faint);
+.header-user {
+  padding-left: 0;
+  border-left: 0;
 }
 
 .header-actions {
@@ -304,12 +283,27 @@
   color: var(--text-secondary);
 }
 
+
+.header-heading {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
 .header-user {
   display: flex;
   align-items: center;
   gap: 10px;
   padding-left: 8px;
   border-left: 1px solid var(--border);
+  padding-left: 0;
+  border-left: 0;
 }
 
 .user-avatar {
@@ -414,6 +408,48 @@
   font-size: 22px;
   font-weight: 650;
   letter-spacing: -0.03em;
+}
+
+
+/* ---------- Overview layout polish ---------- */
+
+/* Side-by-side panels end at the same height (the default is align-items: start) */
+.overview-grid--equal {
+  align-items: stretch;
+}
+
+.panel--fill {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Status has fewer rows than the department chart, so spread its rows
+   evenly instead of leaving empty space at the bottom of the card */
+.panel--fill .status-legend {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+/* Recent hires as a row of cards (5 across on a wide screen, wrapping on narrow ones) */
+.hire-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.hire-row,
+.hire-row:last-child {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
 }
 
 .grid-card {

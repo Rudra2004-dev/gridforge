@@ -73,8 +73,8 @@ function OverviewPage() {
         </article>
       </section>
 
-      <div className="overview-grid">
-        <section className="panel" aria-labelledby="headcount-title">
+            <div className="overview-grid overview-grid--equal">
+        <section className="panel panel--fill" aria-labelledby="headcount-title">
           <h2 className="panel-title" id="headcount-title">
             Headcount by department
           </h2>
@@ -102,66 +102,58 @@ function OverviewPage() {
           </ul>
         </section>
 
-        <div className="overview-side">
-          <section className="panel" aria-labelledby="status-title">
-            <h2 className="panel-title" id="status-title">
-              Status
-            </h2>
-            <div
-              className="status-bar"
-              role="img"
-              aria-label={STATUS_OPTIONS.map(
-                (status) => `${status}: ${statusCounts[status]}`,
-              ).join(", ")}
-            >
-              {STATUS_OPTIONS.map((status) => (
-                <span
-                  key={status}
-                  className={`status-segment status-segment--${STATUS_MODIFIER[status]}`}
-                  style={{ width: `${total === 0 ? 0 : (statusCounts[status] / total) * 100}%` }}
-                />
-              ))}
-            </div>
-            <ul className="status-legend">
-              {STATUS_OPTIONS.map((status) => (
-                <li key={status}>
-                  <Link
-                    to="/employees"
-                    className="legend-row"
-                    onClick={() => showOnly({ status })}
-                  >
-                    <span
-                      className={`legend-dot status-segment--${STATUS_MODIFIER[status]}`}
-                      aria-hidden="true"
-                    />
-                    <span>{status}</span>
-                    <b>{statusCounts[status].toLocaleString()}</b>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="panel" aria-labelledby="hires-title">
-            <h2 className="panel-title" id="hires-title">
-              Recent hires
-            </h2>
-            <ul className="hire-list">
-              {recentHires.map((employee) => (
-                <li key={employee.id} className="hire-row">
-                  <div className="hire-meta">
-                    <strong>{employee.name}</strong>
-                    <span>
-                      {employee.role} · {employee.department}
-                    </span>
-                  </div>
-                  <time dateTime={employee.joiningDate}>{formatIsoDate(employee.joiningDate)}</time>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+        <section className="panel panel--fill" aria-labelledby="status-title">
+          <h2 className="panel-title" id="status-title">
+            Status
+          </h2>
+          <div
+            className="status-bar"
+            role="img"
+            aria-label={STATUS_OPTIONS.map((status) => `${status}: ${statusCounts[status]}`).join(", ")}
+          >
+            {STATUS_OPTIONS.map((status) => (
+              <span
+                key={status}
+                className={`status-segment status-segment--${STATUS_MODIFIER[status]}`}
+                style={{ width: `${total === 0 ? 0 : (statusCounts[status] / total) * 100}%` }}
+              />
+            ))}
+          </div>
+          <ul className="status-legend">
+            {STATUS_OPTIONS.map((status) => (
+              <li key={status}>
+                <Link to="/employees" className="legend-row" onClick={() => showOnly({ status })}>
+                  <span
+                    className={`legend-dot status-segment--${STATUS_MODIFIER[status]}`}
+                    aria-hidden="true"
+                  />
+                  <span>{status}</span>
+                  <b>{statusCounts[status].toLocaleString()}</b>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
+
+      <section className="panel" aria-labelledby="hires-title">
+        <h2 className="panel-title" id="hires-title">
+          Recent hires
+        </h2>
+        <ul className="hire-list">
+          {recentHires.map((employee) => (
+            <li key={employee.id} className="hire-row">
+              <div className="hire-meta">
+                <strong>{employee.name}</strong>
+                <span>
+                  {employee.role} · {employee.department}
+                </span>
+              </div>
+              <time dateTime={employee.joiningDate}>{formatIsoDate(employee.joiningDate)}</time>
+            </li>
+          ))}
+        </ul>
+      </section>
     </>
   );
 }

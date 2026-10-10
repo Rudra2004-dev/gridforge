@@ -1,10 +1,16 @@
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu } from "lucide-react";
+import { useMatches } from "react-router-dom";
+import { getRouteHeading } from "../../lib/routeHandle";
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 function Header({ onMenuClick }: HeaderProps) {
+  // The last match is the deepest active route (the page)
+  const matches = useMatches();
+  const heading = getRouteHeading(matches.at(-1)?.handle);
+
   return (
     <header className="header">
       <button
@@ -16,16 +22,9 @@ function Header({ onMenuClick }: HeaderProps) {
         <Menu size={16} />
       </button>
 
-      <label className="header-search">
-        <Search size={15} />
-        <input type="search" placeholder="Search workspace" />
-      </label>
+      {heading && <p className="header-heading">{heading}</p>}
 
       <div className="header-actions">
-        <button type="button" className="icon-button" aria-label="Notifications">
-          <Bell size={16} />
-        </button>
-
         <div className="header-user">
           <div className="user-avatar" aria-hidden="true">
             RP

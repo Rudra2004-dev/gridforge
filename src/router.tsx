@@ -1,23 +1,43 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import App from "./App";
+import type { RouteHandle } from "./lib/routeHandle";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import OverviewPage from "./pages/OverviewPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // layout route: sidebar + header, children render in <Outlet />
+    element: <App />,
     children: [
       { index: true, element: <Navigate to="/overview" replace /> },
-      { path: "overview", element: <OverviewPage /> },
-      { path: "employees", element: <EmployeesPage /> },
-      { path: "analytics", element: <AnalyticsPage /> },
-      { path: "settings", element:  <SettingsPage />   
+      {
+        path: "overview",
+        element: <OverviewPage />,
+        handle: { heading: "Welcome to the Overview" } satisfies RouteHandle,
       },
-      { path: "*", element: <NotFoundPage /> },
+      {
+        path: "employees",
+        element: <EmployeesPage />,
+        handle: { heading: "Welcome to the Data Grid" } satisfies RouteHandle,
+      },
+      {
+        path: "analytics",
+        element: <AnalyticsPage />,
+        handle: { heading: "Welcome to Analytics" } satisfies RouteHandle,
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        handle: { heading: "Welcome to Settings" } satisfies RouteHandle,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
+        handle: { heading: "Page not found" } satisfies RouteHandle,
+      },
     ],
   },
 ]);
