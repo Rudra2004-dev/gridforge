@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # lets you run it manually from the Actions tab
+
+# A newer push to the same branch or PR cancels the run that is still in progress
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The workflow only needs to read the code
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22 # Vite 8 needs Node 20.19+ or 22.12+
+          cache: npm # restores ~/.npm between runs, keyed on package-lock.json
+
+      - name: Install dependencies
+        run: npm ci # clean install that follows package-lock.json exactly
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test --if-present # skipped when there is no "test" script
+
+      - name: Build
+        run: npm run build # tsc -b (type-check) then vite build
