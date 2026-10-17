@@ -1,217 +1,258 @@
-<!--
-  BEFORE PUBLISHING, search this file for "TODO" and fill in:
-  1. Live demo URL
-  2. Screenshots and demo GIF in docs/
-  3. Benchmark numbers (measure them yourself, see "How I measured")
-  4. Delete the Testing section if you haven't added Vitest tests
-  Then delete this comment.
--->
-
-# GridForge
+# GridForge — High-Performance Data Grid
 
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![Zustand](https://img.shields.io/badge/State-Zustand-orange)
+![License](https://img.shields.io/badge/Status-Portfolio%20Project-blue)
 
-An employee data grid built with React and TypeScript that stays smooth at **100,000 rows**. It combines row virtualization, pagination, and memoized client-side search, sort and filter, with a workspace around it: an overview dashboard, analytics, and persistent settings.
+**GridForge** is a high-performance employee data management workspace built with React and TypeScript. It combines row virtualization, pagination, search, sorting, filtering, CSV export, and workforce analytics to deliver a responsive experience with datasets of up to **100,000 employees**.
 
-**[Live demo](https://gridforge-rudra.vercel.app)** · [Report an issue](https://github.com/rudra2004-dev/gridforge/issues)
+🔗 **Live Demo:** [gridforge-rudra.vercel.app](https://gridforge-rudra.vercel.app)  
+💻 **Source Code:** [GitHub Repository](https://github.com/rudra2004-dev/gridforge)
 
-<!-- TODO: add docs/demo.gif (scrolling, searching, sorting, switching to 100,000 rows) -->
-![GridForge demo](docs/demo.gif)
+---
 
-## Highlights
+## Overview
 
-- **Virtualized grid:** only a few dozen row elements exist in the DOM at any time, whether the dataset has 1,000 or 100,000 employees.
-- **One pipeline, pure functions:** `filter → search → sort → paginate → virtualize`, each stage a memoized step over plain functions.
-- **Real product details:** debounced multi-term search, tri-state sorting, CSV export with injection protection, accessible add-employee dialog with validation, settings that survive a refresh.
-- **Built from scratch:** no UI kit, no grid library, no chart library.
+Rendering thousands of records directly in the DOM can make a data-heavy application slow and difficult to navigate.
 
-## Screenshots
+GridForge addresses this challenge with a virtualized data grid and a structured data-processing pipeline. Instead of rendering every employee row simultaneously, it renders only the rows needed for the current viewport.
 
-<!-- TODO: add these three images to docs/screenshots/ -->
-
-| Data grid | Overview | Analytics |
-|---|---|---|
-| ![Data grid](docs/screenshots/data-grid.png) | ![Overview](docs/screenshots/overview.png) | ![Analytics](docs/screenshots/analytics.png) |
+The result is a workspace designed around performance, usability, and maintainable frontend architecture.
 
 ## Features
 
-### Data grid
-- Virtualized rows with a sticky header and a CSS Grid column template shared by header and rows, so columns stay aligned while scrolling
-- **Search:** debounced (250 ms), multi-word AND matching across ID, name, email, role, department and status
-- **Sort:** click a header to cycle ascending, descending, off. Natural ordering (`EMP2` before `EMP10`)
-- **Filter:** status and department, combined with search and sort
-- **Pagination:** 25, 50, 100 or 250 rows per page with a stable seven-slot page control. Changing search, filters, sort or page size returns to page 1
-- **Export CSV:** exports every matching row (not just the current page), RFC 4180 escaping, spreadsheet-formula neutralization, UTF-8 BOM for Excel, date-stamped filename
-- **Add employee:** native `<dialog>` form with validation (required fields, email format and uniqueness, salary and date checks, normalized input)
+### ⚡ High-Performance Data Grid
 
-### Workspace
-- **Overview:** KPIs, headcount by department, status breakdown and recent hires. Chart rows link into the grid with the filter already applied
-- **Analytics:** payroll, median salary, average tenure and inactive rate; department chart switchable between headcount, average salary and payroll; hires per year; salary distribution
-- **Settings:** dataset size (1,000 / 10,000 / 100,000), row density (comfortable 56 px or compact 40 px), reset data. Saved to `localStorage` and validated on load
-- **Routing:** layout route with `<Outlet />`, `NavLink` active states, per-route header greeting via route `handle`, 404 page, scroll restoration
-- Collapsible sidebar and a responsive layout
+- **Row virtualization** using TanStack Virtual to limit the number of rendered DOM elements.
+- Supports configurable datasets of 1,000, 10,000, and 100,000 employees.
+- Sticky column headers and aligned columns using CSS Grid.
+- Comfortable and compact row-density options.
+- Responsive workspace layout with a collapsible sidebar.
+
+### 🔎 Search, Sort & Filter
+
+- Debounced search with a 250 ms delay.
+- Multi-word search across employee ID, name, email, role, department, and status.
+- Tri-state sorting: ascending, descending, and disabled.
+- Natural sorting for identifiers such as `EMP2` and `EMP10`.
+- Combined department and employee-status filters.
+- Pagination with configurable page sizes of 25, 50, 100, and 250 rows.
+
+### 📊 Workforce Analytics
+
+- Overview dashboard with key workforce metrics.
+- Employee headcount by department.
+- Employee-status distribution.
+- Recent hires overview.
+- Payroll, median salary, average tenure, and inactive-rate metrics.
+- Department analytics with headcount, average salary, and payroll views.
+- Hiring trends and salary distribution.
+
+### 📁 Data Management
+
+- Export all matching employees to CSV, not just the current page.
+- CSV escaping compliant with RFC 4180.
+- Spreadsheet formula-injection mitigation for exported text fields.
+- UTF-8 BOM for improved Excel compatibility.
+- Add-employee dialog with input validation.
+- Validation for required fields, email format and uniqueness, salary, and dates.
+
+### ⚙️ Workspace Settings
+
+- Configurable dataset size.
+- Adjustable row density.
+- Persistent preferences using `localStorage`.
+- Validation of stored settings with fallback defaults.
+- Client-side routing with active navigation states, a 404 page, and scroll restoration.
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React 19 | Component-based user interface |
+| TypeScript | Type safety and maintainability |
+| Vite | Development server and production builds |
+| TanStack Virtual | Efficient row virtualization |
+| Zustand | Centralized application state |
+| React Router 7 | Client-side routing |
+| Lucide React | Icons |
+| CSS | Responsive layouts, data-grid styling, and charts |
+| Vitest | Unit testing, where configured |
+
+## Architecture
+
+GridForge separates source data, transformation logic, rendering, and workspace presentation.
+
+```mermaid
+flowchart TD
+    A["Employee Dataset"]
+    B["Filtering"]
+    C["Debounced Search"]
+    D["Sorting"]
+    E["Pagination"]
+    F["Row Virtualization"]
+    G["Rendered Data Grid"]
+    H["CSV Export"]
+    I["Overview & Analytics"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    D --> H
+    A --> I
+```
+
+Each transformation is designed to operate independently, making the data-processing pipeline easier to understand, test, and maintain.
+
+### Virtualization Strategy
+
+GridForge uses TanStack Virtual to calculate which rows should be visible inside the scroll container.
+
+- A spacer represents the total scrollable height of the dataset.
+- Only visible rows and a small overscan buffer are rendered.
+- Rows are positioned using transforms to maintain their correct positions.
+- A shared CSS Grid column template keeps headers and rows aligned.
+
+This approach reduces DOM overhead when working with large datasets.
+
+### State Management
+
+Zustand manages employee data, search queries, sorting, and filters. Workspace preferences are persisted separately in `localStorage`.
+
+Derived data is computed from the source state rather than duplicated in the store, helping prevent inconsistent results.
 
 ## Performance
 
-Benchmark: 10,000 employees in a single list (pagination bypassed), same row markup, Chrome, 4x CPU slowdown for the FPS test.
+GridForge is designed to handle datasets containing up to 100,000 employee records.
 
-<!-- TODO: replace every TODO below with numbers you measured -->
+The key performance strategy is to render only the rows required for the current viewport rather than mounting every row simultaneously.
 
-| Metric | Naive render (all rows) | Virtualized |
-|---|---|---|
-| Row elements in the DOM | TODO | TODO |
-| DOM nodes (Performance monitor) | TODO | TODO |
-| Time to render the list | TODO | TODO |
-| Scroll FPS (4x CPU slowdown) | TODO | TODO |
+**Benchmark results:** Quantitative comparisons against a non-virtualized implementation should be added after measuring DOM node counts, render time, and scroll performance under the same test conditions.
 
-At 100,000 rows the virtualized grid renders TODO row elements.
+## Getting Started
 
-<details>
-<summary>How I measured</summary>
+### Prerequisites
 
-1. Settings → **10,000** employees.
-2. In `DataGrid.tsx`, temporarily pass `visibleEmployees` instead of `pageItems` to `VirtualizedRows`, so the list isn't paginated.
-3. **Row elements:** run `document.querySelectorAll(".vgrid-body-row").length` in the console.
-4. **DOM nodes:** DevTools → Performance monitor → DOM Nodes.
-5. **Render time:** Performance panel, record a page reload, and note the time until the grid is painted.
-6. **Scroll FPS:** set CPU to 4x slowdown, record 5 seconds of continuous scrolling, and read the frame rate from the Frames row.
-7. **Naive baseline:** temporarily replace the virtualizer with `employees.map(...)` rendering the same row markup, then repeat steps 3 to 6.
-8. Revert both temporary changes.
+- Node.js 20.19 or newer recommended.
+- npm.
+- Git.
 
-</details>
-
-## How it works
-
-### Virtualization
-
-The scroll container has a bounded height (`max-height` plus `overflow: auto`). Inside it, a spacer element is `count × rowHeight` tall, so the scrollbar represents the whole list. [TanStack Virtual](https://tanstack.com/virtual) reports which rows intersect the viewport (plus an overscan buffer of 10), and only those are rendered, each absolutely positioned with `transform: translateY(...)`.
-
-### Data pipeline
-
-```mermaid
-flowchart LR
-  A["employees<br/>(Zustand store)"] --> B["filter<br/>status, department"]
-  B --> C["search<br/>debounced, multi-term"]
-  C --> D["sort<br/>asc, desc, off"]
-  D --> E["paginate<br/>25 to 250 per page"]
-  E --> F["virtualize<br/>a few dozen DOM rows"]
-  D --> G["Export CSV<br/>all matching rows"]
-```
-
-Each stage is a pure function in its own `useMemo`, so changing the sort doesn't redo the search, and typing in the search box doesn't redo the filter. Stages return their input array unchanged when idle, so with nothing active the pipeline allocates nothing new.
-
-### State
-
-| Store | Holds | Persisted |
-|---|---|---|
-| `employee.store` | employees, search query, sort, filters | No (regenerated from a fixed seed) |
-| `settings.store` | dataset size, row density | Yes, `localStorage` with validation on load |
-
-Derived data (filtered lists, aggregates, the current page) is **computed, never stored**, so it can't drift out of sync with its source.
-
-## Key decisions
-
-| Decision | Why |
-|---|---|
-| Headless virtualizer (TanStack Virtual) | Full control over markup and styling, works with CSS Grid |
-| Div and CSS Grid instead of `<table>` | A table sizes columns from the rows currently rendered, which changes as virtualization swaps rows. One shared `grid-template-columns` keeps header and rows aligned |
-| Pure functions for filter, search, sort, export, validation, analytics | No React inside, so they are trivial to unit test and reuse |
-| Zustand with selectors | One source of truth without boilerplate; components re-render only for the slice they read |
-| Seeded generator (mulberry32) | Same data on every load: reproducible demos, screenshots and benchmarks |
-| Native `<dialog>` | Focus trapping, Esc to close, inert background and backdrop without a library |
-| Hand-built charts | Two simple chart shapes don't justify a charting dependency; keeps markup accessible |
-| Raw numbers in CSV exports | A formatted `$80,000` contains a comma and isn't numeric in Excel |
-
-## Challenges and what I learned
-
-- **Columns drifting out of alignment.** My first version used a `<table>` with automatic layout. The browser sized columns from whichever rows were rendered, so widths shifted as virtualization swapped rows, and the header disagreed with the body. I moved to CSS Grid with one column template shared by the header and every row, and placed the sticky header inside the same scroll container so the scrollbar affects both equally.
-- **Resetting to page 1 without an effect.** Instead of syncing state in a `useEffect`, the pagination hook stores the requested page together with a key describing the current view (query, filters, sort, page size). If the key changes, the stored page is ignored and page 1 is derived, with no extra render and no stale state.
-- **CSV safety.** Employee names are user data, and a cell like `=HYPERLINK(...)` runs as a formula in Excel. Text cells starting with `=`, `+`, `-` or `@` are prefixed so they stay text, and fields containing commas, quotes or newlines are quoted per RFC 4180.
-- **Not trusting `localStorage`.** Persisted settings are validated on load and fall back to defaults, so a hand-edited `datasetSize` can't freeze the page.
-- **Generating 100,000 unique emails.** Looping until a free address was found became quadratic when 900 name combinations repeat. A per-name counter makes it O(1) and produces identical output.
-
-## Tech stack
-
-React 19 · TypeScript · Vite · Zustand · TanStack Virtual · React Router 7 · lucide-react · ESLint
-
-## Getting started
-
-Requires a recent Node.js LTS (20.19 or newer recommended).
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/rudra2004-dev/gridforge.git
+
+# Enter the project directory
 cd gridforge
+
+# Install dependencies
 npm install
+
+# Start the development server
 npm run dev
 ```
 
-| Script | What it does |
+Open the local URL printed in your terminal to explore the application.
+
+### Available Scripts
+
+| Command | Description |
 |---|---|
-| `npm run dev` | Start the dev server |
+| `npm run dev` | Start the development server |
 | `npm run build` | Type-check and build for production |
-| `npm run preview` | Serve the production build locally |
+| `npm run preview` | Preview the production build |
 | `npm run lint` | Run ESLint |
-| `npm test` | Run unit tests (Vitest) |
+| `npm test` | Run unit tests, if the test script is configured |
 
-## Project structure
+## Project Structure
 
-```
+```text
 src/
 ├── components/
-│   ├── charts/          BarChart, ColumnChart (CSS-based)
-│   ├── grid/            DataGrid, VirtualizedRows, Pagination, pagination.utils
-│   └── layout/          Header, PageContainer, Sidebar
+│   ├── charts/          # CSS-based charts
+│   ├── grid/            # Data grid, virtualization, pagination
+│   └── layout/          # Header, sidebar, page container
 ├── features/
-│   ├── employees/       store, types, generator, search, sort, filter,
-│   │                    export, validation, overview, analytics,
-│   │                    AddEmployeeDialog, EmployeePageHeader
-│   └── settings/        settings.store (persisted preferences)
-├── hooks/               useDebounce, usePagination
-├── lib/                 routeHandle (typed route metadata)
-├── pages/               Overview, Employees, Analytics, Settings, NotFound
-├── App.tsx              layout route
-├── router.tsx           route table
-└── main.tsx             entry
+│   ├── employees/       # Employee data, state, search, sorting,
+│   │                    # filtering, CSV export, analytics
+│   └── settings/        # Persisted workspace preferences
+├── hooks/               # Debouncing and pagination hooks
+├── lib/                 # Shared routing utilities
+├── pages/               # Overview, employees, analytics, settings
+├── App.tsx
+├── router.tsx
+└── main.tsx
 ```
 
-## Accessibility
+## Engineering Challenges & Design Decisions
 
-- Every control is a real `<button>`, `<select>` or `<a>`, with visible focus styles
-- Sortable headers expose `aria-sort`; the current page and active nav item use `aria-current`
-- The footer range text is `aria-live="polite"`, so result counts are announced
-- The add-employee dialog uses native modal behavior (focus trap, Esc, focus restore); form errors are tied to their inputs with `aria-invalid` and `aria-describedby`, and focus moves to the first invalid field
-- Charts expose their values as text (a list for bars, an `aria-label` summary for columns), and animations respect `prefers-reduced-motion`
+### 1. Keeping Columns Aligned During Virtualization
 
-The grid is not a full ARIA grid widget: there is no arrow-key navigation between cells.
+Traditional table layout can cause column widths to shift when rows are dynamically mounted and unmounted.
 
-<!-- TODO: delete this Testing section if you haven't added Vitest tests -->
-## Testing
+**Solution:** Use CSS Grid with a shared column template for the header and body rows.
 
-Unit tests cover the pure logic: CSV escaping and filenames, form validation, page-window calculation, overview and analytics aggregation, and the seeded generator.
+### 2. Efficient Data Processing
 
-```bash
-npm test
-```
+Repeatedly processing the same dataset for every UI update can introduce unnecessary work.
 
-## Deployment
+**Solution:** Separate filtering, searching, sorting, and pagination into memoized transformation stages.
 
-Static build, deployable anywhere. Because routing is client-side, the host must serve `index.html` for unknown paths, otherwise refreshing on `/employees` returns a 404.
+### 3. Safe CSV Export
 
-- **Vercel:** import the repo (framework preset: Vite) and add `vercel.json`:
-  ```json
-  { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-  ```
-- **Netlify:** build command `npm run build`, publish directory `dist`, and add `public/_redirects` containing `/* /index.html 200`
+Spreadsheet applications may interpret user-controlled cell values beginning with formula characters as executable formulas.
 
-## Known limitations and next steps
+**Solution:** Escape CSV fields, neutralize potentially dangerous text prefixes, and preserve compatibility with spreadsheet applications.
 
-- Employees added through the form are kept in memory only and reset on refresh. Next: persist user-added rows.
-- Search, sort and filter run on the main thread. At 100,000 rows, sorting a text column pauses briefly. Next: move the pipeline into a Web Worker, or sort on a server.
-- Data is generated locally. Next: a mock API with infinite loading (TanStack Query) to exercise server-side pagination.
-- Next: column resizing and visibility, row selection with bulk actions, URL-synced filters so views are shareable, and arrow-key cell navigation.
+### 4. Reliable Client-Side Preferences
+
+Persisted browser storage should not be assumed to contain valid values.
+
+**Solution:** Validate settings when loading them and fall back to safe defaults when necessary.
+
+### 5. Deterministic Large Datasets
+
+Randomly generated data makes debugging, screenshots, and performance comparisons harder to reproduce.
+
+**Solution:** Use a seeded employee generator to produce consistent datasets.
+
+## Known Limitations
+
+- Employee records added through the form are currently held in memory and reset after a page refresh.
+- Search, sorting, and filtering run on the main thread; sorting large datasets may cause brief pauses.
+- Employee data is generated locally rather than retrieved from a production backend.
+- The data grid does not yet provide full spreadsheet-style arrow-key navigation between cells.
+
+## Future Improvements
+
+- Persist employee changes using a backend API and database.
+- Move expensive data-processing operations into a Web Worker.
+- Add server-side filtering, sorting, and pagination.
+- Implement column resizing and column visibility controls.
+- Add row selection and bulk operations.
+- Synchronize search and filter state with URL parameters.
+- Improve keyboard navigation and accessibility for grid interactions.
+- Add repeatable performance benchmarks and automated regression tests.
+
+## Contributing
+
+Suggestions, bug reports, and improvements are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes and run the relevant checks.
+4. Open a pull request with a clear description of the changes.
 
 ## Author
 
-Built by Rudra Prosad Ghosh.
+**Rudra Prosad Ghosh**
+
+- GitHub: [@rudra2004-dev](https://github.com/rudra2004-dev)
+
+Built to explore high-performance React rendering, scalable client-side data processing, state management, and production-minded frontend engineering.
